@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>server-2</title>
     <script src="https://unpkg.com/petite-vue" defer init></script>
+    <script src="getYMD.js"></script>
     <style>
       [v-cloak] {
         display: none;
@@ -57,9 +58,9 @@
         <th>内容</th>
       </tr>
       <tr>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>{{ formatTime(i) }}</td>
+        <td>{{ p.title }}</td>
+        <td>{{ p.content }}</td>
       </tr>
     </table>
   </body>
@@ -69,11 +70,29 @@
       return {
         // 変数（プロパティ）
         list: false,
-        apikey: 'GET https://api.nhk.or.jp/v2/pg/list/130/g1/2025-10-10.json?pKkJGwZA6ARQcAzyouJpq3OKHG7Gbo35',
+        apikey: 'pKkJGwZA6ARQcAzyouJpq3OKHG7Gbo35',
         area: '130',
-        service: 'g1'
+        service: 'g1',
 
         // 関数（メソッド）
+
+        async getProgramList() {
+          const today = getYMD(new Date());
+          const url = `https://api.nhk.or.jp/v2/pg/list/${this.area}/${this.service}/${today}.json?apikey=${this.apikey}`;
+          try {
+            const res = await fetch(url);
+            const data = await res.json();
+            this.list = data.list[this.service] || [];
+          } catch (e) {
+            alert('データ取得に失敗しました');
+            console.error(e);
+          }
+        },
+        formatTime(i) {
+          if (!this.list || !this.list[i]) return '';
+          const t = this.list[i].start_time.split('T')[1]; // "08:00:00+09:00"
+          return t.split(':')[0] + ':' + t.split(':')[1]; // "08:00"
+        }
       };
     }
   </script>
