@@ -61,17 +61,10 @@
         <th>タイトル</th>
         <th>内容</th>
       </tr>
-<<<<<<< HEAD
       <tr v-for="(item, i) in list" :key="i">
         <td>{{ formatTime(i) }}</td>
         <td>{{ item.title }}</td>
         <td>{{ item.content }}</td>
-=======
-      <tr>
-        <td>{{ formatTime(i) }}</td>
-        <td>{{ p.title }}</td>
-        <td>{{ p.content }}</td>
->>>>>>> 75116db9e227a5e7f49e45c97cacf215361e1841
       </tr>
     </table>
   </body>
@@ -88,7 +81,6 @@
       return {
         // 変数（プロパティ）
         list: false,
-<<<<<<< HEAD
         area: '130',
         service: 'g1',
         apikey: 'pKkJGwZA6ARQcAzyouJpq3OKHG7Gbo35',
@@ -114,30 +106,6 @@
           const [date, time] = start.split('T');
           const [hour, minute] = time.split(':');
           return `${hour}:${minute}`;
-=======
-        apikey: 'pKkJGwZA6ARQcAzyouJpq3OKHG7Gbo35',
-        area: '130',
-        service: 'g1',
-
-        // 関数（メソッド）
-
-        async getProgramList() {
-          const today = getYMD(new Date());
-          const url = `https://api.nhk.or.jp/v2/pg/list/${this.area}/${this.service}/${today}.json?apikey=${this.apikey}`;
-          try {
-            const res = await fetch(url);
-            const data = await res.json();
-            this.list = data.list[this.service] || [];
-          } catch (e) {
-            alert('データ取得に失敗しました');
-            console.error(e);
-          }
-        },
-        formatTime(i) {
-          if (!this.list || !this.list[i]) return '';
-          const t = this.list[i].start_time.split('T')[1]; // "08:00:00+09:00"
-          return t.split(':')[0] + ':' + t.split(':')[1]; // "08:00"
->>>>>>> 75116db9e227a5e7f49e45c97cacf215361e1841
         }
       };
     }
