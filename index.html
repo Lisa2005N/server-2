@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>server-2</title>
     <script src="https://unpkg.com/petite-vue" defer init></script>
+    <script src="getYMD.js"></script>
     <style>
       [v-cloak] {
         display: none;
       }
       table {
         margin-top: 1em;
+        width: 100%;
       }
       table,
       td,
@@ -23,6 +25,9 @@
         color: white;
         border-color: white;
         padding: 0 5px;
+      }
+      td {
+        padding: 3px 5px;
       }
     </style>
   </head>
@@ -51,27 +56,57 @@
     </label>
 
     <table>
-      <tr>
+      <tr v-if="list && list.length > 0">
         <th>時刻</th>
         <th>タイトル</th>
         <th>内容</th>
       </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
+      <tr v-for="(item, i) in list" :key="i">
+        <td>{{ formatTime(i) }}</td>
+        <td>{{ item.title }}</td>
+        <td>{{ item.content }}</td>
       </tr>
     </table>
   </body>
 
   <script>
+    function getYMD(date) {
+      const y = date.getFullYear();
+      const m = ('0' + (date.getMonth() + 1)).slice(-2);
+      const d = ('0' + date.getDate()).slice(-2);
+      return `${y}-${m}-${d}`;
+    }
+
     function dataset() {
       return {
         // 変数（プロパティ）
         list: false,
-        apikey: '' // 自分で取得する
+        area: '130',
+        service: 'g1',
+        apikey: 'pKkJGwZA6ARQcAzyouJpq3OKHG7Gbo35',
+        // 自分で取得する
 
         // 関数（メソッド）
+        async getProgramList() {
+          const date = getYMD(new Date()); // getYMD.js から日付を取得
+          const url = `https://api.nhk.or.jp/v2/pg/list/${this.area}/${this.service}/${date}.json?key=${this.apikey}`;
+          try {
+            const res = await fetch(url);
+            const data = await res.json();
+            // サービス名（例 g1, s1）をキーにして配列を取得
+            this.list = data.list[this.service] || [];
+          } catch (e) {
+            console.error(e);
+            alert('番組表を取得できませんでした。');
+          }
+        },
+
+        formatTime(i) {
+          const start = this.list[i].start_time; // 例: "2025-10-10T05:00:00+09:00"
+          const [date, time] = start.split('T');
+          const [hour, minute] = time.split(':');
+          return `${hour}:${minute}`;
+        }
       };
     }
   </script>
